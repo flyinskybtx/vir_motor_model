@@ -15,8 +15,8 @@ argparser.add_argument('-v', dest='vel', type=float, default=10)
 argparser.add_argument('-a', dest='acc', type=float, default=20)
 argparser.add_argument('-n', dest='noise', type=float, default=0.1)
 argparser.add_argument('-s', dest='steps', type=int, default=50)
-argparser.add_argument(dest='const_voltage', action='store_true')
-argparser.add_argument('-N', dest='num_samples', default=1e4, type=float)
+argparser.add_argument('-r', dest='rand_voltage', action='store_true', help='是否使用随机电压')
+argparser.add_argument('-N',  dest='num_samples', default=1e4, type=float)
 
 if __name__ == '__main__':
     args = argparser.parse_args()

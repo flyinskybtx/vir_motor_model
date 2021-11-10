@@ -15,6 +15,7 @@ argparser.add_argument('-v', dest='vel', type=float, default=100)  # 实验中�
 argparser.add_argument('-a', dest='acc', type=float, default=1000)  # 实验中观测的最大值1000
 argparser.add_argument('-n', dest='noise', type=float, default=0.0)
 argparser.add_argument('-s', dest='steps', type=int, default=1e4)  # 实验中开环大概1e4步后趋于稳定
+argparser.add_argument('-r', dest='rand_voltage', action='store_true', help='是否使用随机电压')
 argparser.add_argument('-N', dest='num_samples', default=1e4, type=float)
 
 if __name__ == '__main__':
