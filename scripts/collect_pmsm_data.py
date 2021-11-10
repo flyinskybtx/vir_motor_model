@@ -38,9 +38,9 @@ if __name__ == '__main__':
         filename = f'{args.noise}_noise' + filename
 
     if args.rand_voltage:
-        filename = 'const_U_' + filename
-    else:
         filename = 'rand_U_' + filename
+    else:
+        filename = 'const_U_' + filename
 
     filename = f'{int(args.num_samples)}_of_' + filename
     filename = os.path.join(DATA_DIR, filename)
@@ -62,7 +62,7 @@ if __name__ == '__main__':
                 state, state_info = env.reset()  # Ia, Ib, pos, vel acc
 
             info = {k + '_0': v for k, v in state_info.items()}
-            if not args.rand_voltage:  # 新采样动作
+            if args.rand_voltage:  # 新采样动作
                 action = env.action_space.sample()  #
 
             new_state, _, done, new_state_info = env.step(action)
