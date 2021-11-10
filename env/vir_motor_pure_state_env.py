@@ -5,22 +5,21 @@ import gym
 import numpy as np
 import tqdm
 
-from dige_stl.general_library.math_lib import limit_cycle, anti_clockwise_conv
+from dige_stl.general_library.math_lib import limit_cycle, anti_clockwise_conv, clockwise_conv
 from dige_stl.general_library.math_macro import CONST
-from dige_stl.general_library.signal_generator import SignalGenerator
 from virtual_model.vir_model.vir_motor_model import VirRotaryMotorModel
 from virtual_model.vir_state_equation.virtual_device_state import VirState
 
 
 class VirMotorFullStateEnv(gym.Env):
-    def __init__(self, u=20, i=4, vel=10, acc=20, noise=0, seq_len=100):
+    def __init__(self, u=20, i=50, vel=100, acc=1000, noise=0, seq_len=1e4):
         self.motor = VirRotaryMotorModel()
         self.noise = noise
-        self.max_step = seq_len
+        self.max_step = int(seq_len)
         self.vel_limit = vel
         self.acc_limit = acc
         self.i_limit = i
-        self._step=0
+        self._step = 0
 
         self.motor.flush()
         self.dt = self.motor.device_data.env_param.dt.value
@@ -29,6 +28,15 @@ class VirMotorFullStateEnv(gym.Env):
         limits = np.array([i, i, 2 * np.pi / self.pn, vel, acc])
         self.observation_space = gym.spaces.Box(
             low=-limits, high=limits, shape=(5,), dtype=np.float32)
+
+    def udq_step(self, uduq):
+        ud, uq = uduq
+        pos = self.motor.device_data.motor.output.pos.value
+        angle_e = pos * self.pn
+        angle_e = limit_cycle(angle_e, CONST.TWO_PI)  # 限制在0~2pi之间
+        ua, ub = clockwise_conv(angle_e, ud, uq)
+        return self.step((ua, ub))
+
 
     def step(self, action):
         ua, ub = action
@@ -52,7 +60,7 @@ class VirMotorFullStateEnv(gym.Env):
         Iq = output.Iq.value
 
         if any(np.abs(np.array([Ia, Ib, vel, acc, self._step])) > np.array([self.i_limit, self.i_limit, self.vel_limit,
-                                                             self.acc_limit, self.max_step])):
+                                                                            self.acc_limit, self.max_step])):
             done = True
         else:
             done = False
@@ -64,7 +72,7 @@ class VirMotorFullStateEnv(gym.Env):
         return state, 0, done, info
 
     def reset(self):
-        self._step=0
+        self._step = 0
         self.motor.flush()
         vir_state = VirState()
         Ia, Ib, pos, vel, acc = self.observation_space.sample()
@@ -101,41 +109,5 @@ class VirMotorFullStateEnv(gym.Env):
         state = np.array([Ia, Ib, pos, vel, acc])
         return state, info
 
-
-def render(self, mode="human"):
-    pass
-
-
-if __name__ == '__main__':
-    env = VirMotorFullStateEnv()
-
-    # Dummy run
-    _, dummy_state_info = env.reset()  # Ia, Ib, pos, vel acc
-    dummy_info = {k + '_0': v for k, v in dummy_state_info.items()}
-    _, dummy_new_state_info = env.step(env.action_space.sample())
-    dummy_info.update(dummy_new_state_info)
-    field_names = list(dummy_info.keys())
-
-    # RUN
-    NUM_EPISODES = 2e2
-    NUM_STEPS = 5e3
-
-    action = env.action_space.sample()  #
-
-    with open(f"data_same_uaub{datetime.now().strftime('%Y%m%d-%H%M%S')}.csv", 'w', newline='') as csvfile:
-        field_names = field_names
-        writer = csv.DictWriter(csvfile, fieldnames=field_names)
-        writer.writeheader()
-
-        for _ in tqdm.trange(int(NUM_EPISODES)):
-            state, state_info = env.reset()  # Ia, Ib, pos, vel acc
-            for _ in range(int(NUM_STEPS)):
-                info = {k + '_0': v for k, v in state_info.items()}
-                new_state, new_state_info = env.step(action)
-                # action = env.action_space.sample()  # 每一步的动作
-                # s_a_ss = np.concatenate([state, action, new_state]).round(4)
-                info.update(new_state_info)
-
-                state_info = {k: new_state_info[k] for k in state_info.keys()}
-                writer.writerow(info)
-                # state = new_state
+    def render(self, mode="human"):
+        pass

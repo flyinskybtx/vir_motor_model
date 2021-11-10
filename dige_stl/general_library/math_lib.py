@@ -39,7 +39,7 @@ def clockwise_conv(sd, xd, xq):
     """ Inverse Park Transform"""
     sin_sd = math.sin(sd)
     cos_sd = math.cos(sd)
-    xa = xd*cos_sd + xq*sin_sd
-    xb = -xd*sin_sd + xq*cos_sd
+    xa = xd*cos_sd - xq*sin_sd
+    xb = xd*sin_sd + xq*cos_sd
     return xa, xb
 
