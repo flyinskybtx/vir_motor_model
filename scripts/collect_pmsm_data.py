@@ -8,15 +8,15 @@ import tqdm
 from data import DATA_DIR
 from env.vir_motor_pure_state_env import VirMotorFullStateEnv
 
-argparser = argparse.ArgumentParser(description="PMSM args")
-argparser.add_argument('-u', dest='voltage', type=float, default=20)
-argparser.add_argument('-i', dest='current', type=float, default=4)
-argparser.add_argument('-v', dest='vel', type=float, default=10)
-argparser.add_argument('-a', dest='acc', type=float, default=20)
-argparser.add_argument('-n', dest='noise', type=float, default=0.1)
-argparser.add_argument('-s', dest='steps', type=int, default=50)
-argparser.add_argument('-r', dest='rand_voltage', action='store_true', help='是否使用随机电压')
-argparser.add_argument('-N',  dest='num_samples', default=1e4, type=float)
+argparser = argparse.ArgumentParser(description="PMSM DQ 控制模式的args")
+argparser.add_argument('-u', dest='voltage', type=float, default=20, help='电压控制量绝对值的最大值')
+argparser.add_argument('-i', dest='current', type=float, default=50, help='状态量电流绝对值的最大值')
+argparser.add_argument('-v', dest='vel', type=float, default=100, help='状态量速度绝对值的最大值')
+argparser.add_argument('-a', dest='acc', type=float, default=1000, help='状态量速度绝对值的最大值')
+argparser.add_argument('-n', dest='noise', type=float, default=0.1, help='电流观测的误差级别')
+argparser.add_argument('-s', dest='steps', type=int, default=50, help='每个episode的最大步数')
+argparser.add_argument('-r', dest='rand_voltage', action='store_true', help='每个episode中是否使用随机电压')
+argparser.add_argument('-N', dest='num_samples', default=1e4, type=float, help='收集的总样本数')
 
 if __name__ == '__main__':
     args = argparser.parse_args()
