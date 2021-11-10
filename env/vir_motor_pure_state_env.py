@@ -69,6 +69,7 @@ class VirMotorFullStateEnv(gym.Env):
         info = {}
         for vv in ['Ia', 'Ib', 'pos', 'vel', 'acc', 'Id', 'Iq', 'Ud', 'Uq']:
             info[vv] = eval(vv)
+        self._step += 1
         return state, 0, done, info
 
     def reset(self):
