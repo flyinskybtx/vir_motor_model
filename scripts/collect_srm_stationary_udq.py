@@ -49,7 +49,7 @@ def get_uduq(low, high, bidirection=False):
 if __name__ == '__main__':
     args = argparser.parse_args()
     env = VirMotorFullStateEnv(u=args.voltage, i=args.current, vel=args.vel, acc=args.acc, noise=args.noise,
-                               seq_len=args.steps)
+                               seq_len=args.steps, acc_tol=1)
 
     # Dummy run
     _, dummy_state_info = env.reset()  # Ia, Ib, pos, vel acc
@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
     filename = f'{int(args.num_samples)}_of' + filename
     filename = os.path.join(DATA_DIR, filename)
-    print(f"Saving to file: {filename}")
+    print(f"\nSaving to file: {filename}")
 
     # RUN
     num_episodes = 0

@@ -45,7 +45,7 @@ def get_uduq(low, high, bidirection=False):
 if __name__ == '__main__':
     args = argparser.parse_args()
     env = VirMotorFullStateEnv(u=args.voltage, i=args.current, vel=args.vel, acc=args.acc, noise=args.noise,
-                               seq_len=args.steps, acc_tol=10)
+                               seq_len=args.steps, acc_tol=5)
 
     # Dummy run
     _, dummy_state_info = env.reset()  # Ia, Ib, pos, vel acc
