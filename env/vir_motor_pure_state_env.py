@@ -7,16 +7,17 @@ from virtual_model.vir_model.vir_motor_model import VirRotaryMotorModel
 from virtual_model.vir_state_equation.virtual_device_state import VirState
 
 NUM_IS_STEADY_STEPS = 10  # 用于判断是否稳态的步数
-STEADY_ACC_TOL = 1
+STEADY_ACC_TOL = 5
 
 
 class VirMotorFullStateEnv(gym.Env):
-    def __init__(self, u=20, i=50, vel=100, acc=1000, noise=0, seq_len=1e4):
+    def __init__(self, u=20, i=50, vel=100, acc=1000, noise=0, seq_len=1e4, acc_tol=5):
         self.motor = VirRotaryMotorModel()
         self.noise = noise
         self.max_step = int(seq_len)
         self.vel_limit = vel
         self.acc_limit = acc
+        self.acc_tol = acc_tol
         self.i_limit = i
         self._step = 0
 
@@ -39,7 +40,7 @@ class VirMotorFullStateEnv(gym.Env):
         # todo: 判断是否稳态了
         acc = state[4]
         self._last_accs = self._last_accs[1:] + [acc]
-        if np.max(np.abs(self._last_accs)) < STEADY_ACC_TOL:
+        if np.max(np.abs(self._last_accs)) < self.acc_tol:
             done = True
         return state, 0, done, info
 
@@ -69,13 +70,6 @@ class VirMotorFullStateEnv(gym.Env):
         else:
             done = False
 
-        # todo：这里先不给状态量加上界
-        # if any(np.abs(np.array([Ia, Ib, vel, acc])) > np.array([self.i_limit,
-        #                                                         self.i_limit,
-        #                                                         self.vel_limit,
-        #                                                         self.acc_limit])):
-        #     done = True
-
         state = np.array([Ia, Ib, pos, vel, acc])
         info = {}
         for vv in ['Ia', 'Ib', 'pos', 'vel', 'acc', 'Id', 'Iq', 'Ud', 'Uq', 'Ua', 'Ub']:
@@ -83,27 +77,34 @@ class VirMotorFullStateEnv(gym.Env):
         self._step += 1
         return state, 0, done, info
 
-    def reset(self, only_step=False):
+    def reset(self, only_step=False, random_state=True):
         self._step = 0
-        self._last_accs = [1] * NUM_IS_STEADY_STEPS  # 用于判断是否稳态
+        self._last_accs = [self.acc_tol+1] * NUM_IS_STEADY_STEPS  # 用于判断是否稳态
 
         if not only_step:  # 正常的情况下重置电机状态
             self.motor.flush()
-            vir_state = VirState()
-            Ia, Ib, pos, vel, acc = self.observation_space.sample()
-            vir_state.pos = pos
-            vir_state.vel = vel
-            vir_state.acc = acc
-            angle_e = pos * self.pn
-            angle_e = limit_cycle(angle_e, 2 * np.pi)  # 限制在0~2pi之间
-            Id, Iq = anti_clockwise_conv(angle_e, Ia, Ib)
-            vir_state.Id = Id
-            vir_state.Iq = Iq
-            self.motor.state_equ.state = vir_state
+            if random_state:
+                vir_state = VirState()
+                Ia, Ib, pos, vel, acc = self.observation_space.sample()
+                vir_state.pos = pos
+                vir_state.vel = vel
+                vir_state.acc = acc
+                angle_e = pos * self.pn
+                angle_e = limit_cycle(angle_e, 2 * np.pi)  # 限制在0~2pi之间
+                Id, Iq = anti_clockwise_conv(angle_e, Ia, Ib)
+                vir_state.Id = Id
+                vir_state.Iq = Iq
+                self.motor.state_equ.state = vir_state
 
-            motor_input = self.motor.device_data.motor.input
-            motor_input.enable.value = 1
-            self.motor.running()
+                motor_input = self.motor.device_data.motor.input
+                motor_input.enable.value = 1
+                self.motor.running()
+            else:
+                motor_input = self.motor.device_data.motor.input
+                motor_input.Ua.value=0
+                motor_input.Ub.value=0
+                motor_input.enable.value = 1
+                self.motor.running()
 
         output = self.motor.device_data.motor.output
         Ia = output.Ia.value

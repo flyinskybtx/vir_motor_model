@@ -68,7 +68,7 @@ if __name__ == '__main__':
             self.sde_param = SignalParam()
             self.sde_param.amp = 10
             self.sde_param.fre_hz = 5
-            self.sde_param.signal_type = SignalType.Signal_Type_Triangle
+            self.sde_param.signal_type = SignalType.Signal_Type_Angle
             self.sde_signal = SignalGenerator()
             self.sde_signal.set_param(self.sde_param, self.dt)
             self.uab_amp = 2

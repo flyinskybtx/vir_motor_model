@@ -78,11 +78,54 @@ class PMSMotorElectricEquation(MotorElectricEquation):  # 通过修饰变成各�
         self.Ia, self.Ib = clockwise_conv(angle_e, X.Id, X.Iq)
 
 
+class SRMMotorElectricEquation(PMSMotorElectricEquation):
+    def __init__(self, motor_data: VirMotorData):
+        super().__init__(motor_data)
+        self.flush()
+
+    def flush(self):  # 开关磁阻电机和永磁同步电机差异是永磁链为零
+        self.R0 = self.motor_param.R0.value
+        self.Lq = self.motor_param.Lq.value
+        self.Ld = self.motor_param.Ld.value
+        self.Lq_inv = 1 / self.Lq
+        self.Ld_inv = 1 / self.Ld
+        self.KF = self.motor_param.kF.value
+        self.Pn = self.motor_data.param.Pn.value
+        self.B = 0
+
+    def running(self, X: VirState):
+        angle_e = X.pos * self.Pn
+        angle_e = limit_cycle(angle_e, CONST.TWO_PI)  # 限制在0~2pi之间
+        Ud, Uq = anti_clockwise_conv(angle_e, self.motor_data.input.Ua.value, self.motor_data.input.Ub.value)
+        # 电气方程
+        angle_vel = X.vel * self.Pn
+        BEMF_d = self.R * X.Id - self.Lq * X.Iq * angle_vel
+        BEMF_q = self.R * X.Iq + (self.Ld * X.Id + self.B) * angle_vel
+        if self.motor_data.input.enable.value == 1:
+            self.dId = (Ud - BEMF_d) * self.Ld_inv
+            self.dIq = (Uq - BEMF_q) * self.Lq_inv
+            self.Fe = 1.5 * self.Pn * X.Iq * ((self.Ld - self.Lq) * X.Id)  # 电磁力
+
+        else:  # 使能后电气方程失效
+            self.dId = 0
+            self.dIq = 0
+            self.Fe = 0
+            X.Id = 0
+            X.Iq = 0
+        self.Ia, self.Ib = clockwise_conv(angle_e, X.Id, X.Iq)
+
+
 class ElectricEquationFactory:
     def __init__(self, motor_data: VirMotorData):
         self.motor_data = motor_data
         self.pms_motor_ele = PMSMotorElectricEquation(self.motor_data)
+        self.srm_motor_ele = SRMMotorElectricEquation(self.motor_data)
 
     def create_electric_equation(self):
         if self.motor_data.param.motor_type.value == MotorType.PMS_Motor:
             return self.pms_motor_ele
+        elif self.motor_data.param.motor_type.value == MotorType.SRM_Motor:
+            return self.srm_motor_ele
+
+
+

@@ -5,19 +5,19 @@ from dige_stl.virtual_model_library.vir_parts_data import VirCurrentADCData, Vir
 
 class VirMotorParam:
     def __init__(self, key, first_name, data_dict):
-        self.motor_type = OD(key, first_name + 'pos_mm', MotorType.PMS_Motor, 'int32', data_dict)
+        self.motor_type = OD(key, first_name + 'pos_mm', MotorType.SRM_Motor, 'int32', data_dict)
         key += 1
-        self.R0 = OD(key, first_name + 'R0', 0.5, 'float32', data_dict)
+        self.R0 = OD(key, first_name + 'R0', 0.084, 'float32', data_dict)
         key += 1
         self.TCR = OD(key, first_name + 'TCR', 0, 'float32', data_dict)
         key += 1
-        self.Ld = OD(key, first_name + 'Ld', 0.002, 'float32', data_dict)
+        self.Ld = OD(key, first_name + 'Ld', 0.98, 'float32', data_dict)
         key += 1
-        self.Lq = OD(key, first_name + 'Lq', 0.001, 'float32', data_dict)
+        self.Lq = OD(key, first_name + 'Lq', 0.97, 'float32', data_dict)
         key += 1
         self.kF = OD(key, first_name + 'kF', 0.07, 'float32', data_dict)   # 力常数
         key += 1
-        self.mass = OD(key, first_name + 'mass', 40.0e-7, 'float32', data_dict)  # 质量或惯量
+        self.mass = OD(key, first_name + 'mass', 62.18, 'float32', data_dict)  # 质量或惯量
         key += 1
         self.friction = OD(key, first_name + 'friction', 0, 'float32', data_dict)   # 静摩擦
         key += 1

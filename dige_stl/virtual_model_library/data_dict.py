@@ -1,6 +1,3 @@
-from assets.data_dict_load import data_model_dict_load
-
-
 class OD:  # 随着开发的需要不断完善
     def __init__(self, key, name, value, data_type, data_dict):
         self.key = key
@@ -13,7 +10,7 @@ class OD:  # 随着开发的需要不断完善
     def set_value(self, data):  # 有些需要调用通信协议将数据发出
         self.value = data
 
-    def get_value(self):   # 发送获取数据的协议
+    def get_value(self):  # 发送获取数据的协议
         return self.value
 
 
@@ -32,10 +29,10 @@ class DeviceDataModelDict:
 
     def get_key_value(self, key):
         if key in self.key_value_dict.keys():
-            return self.key_value_dict[key] .get_value()
+            return self.key_value_dict[key].get_value()
         return None
 
-    def set_name_value(self, name, value):   # 可以通过名字发送数据，也可以通过key发送数据
+    def set_name_value(self, name, value):  # 可以通过名字发送数据，也可以通过key发送数据
         if name in self.name_key_dict.keys():
             key = self.name_key_dict[name]
             if key in self.key_value_dict.keys():
@@ -58,7 +55,6 @@ class DeviceDataModelDict:
             print('no unit')
         print('no one')
         return None
-
 
 # class DataDict:  # 通过excel自动生成
 #     def __init__(self):
@@ -88,4 +84,3 @@ class DeviceDataModelDict:
 # if __name__ == "__main__":
 #     test_data_dict = DataDict()
 #     print(test_data_dict)
-

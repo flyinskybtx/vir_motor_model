@@ -20,6 +20,7 @@ class MotorStateEquation:
         self.cycle_pos = 0
 
     def flush(self, load_mass, load_fric, load_damp):
+        self.state = VirState()  # 状态参数，其中位置是单圈，音圈电机极距为2pi
         self.dyn_equ.flush(load_mass, load_fric, load_damp)
         self.ele_equ.flush()
         self.load_equ.flush()

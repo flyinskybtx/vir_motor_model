@@ -30,8 +30,8 @@ class SignalGenerator:
         self.dt = 0
         self.w = 0
         self.sd = 0
-        self.t1 = 1 / 4
-        self.t2 = 1 - self.t1
+        self.t1 = 1/4
+        self.t2 = 1-self.t1
         self.i_nos = 0
         self.param = SignalParam()
 
@@ -84,3 +84,8 @@ class SignalGenerator:
         else:
             y = 0
         return y
+
+
+
+
+

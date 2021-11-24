@@ -32,19 +32,20 @@ if __name__ == '__main__':
 
     # Filename
     filename = f"_{datetime.now().strftime('%Y%m%d-%H%M%S')}.csv"
+
+    if args.rand_voltage:
+        filename = '_rand_Uab' + filename
+    else:
+        filename = '_const_Uab' + filename
+
     if args.noise == 0:
         filename = 'no_noise' + filename
     else:
         filename = f'{args.noise}_noise' + filename
 
-    if args.rand_voltage:
-        filename = 'rand_U_' + filename
-    else:
-        filename = 'const_U_' + filename
-
     filename = f'{int(args.num_samples)}_of_' + filename
     filename = os.path.join(DATA_DIR, filename)
-    print(f"Saving to file: {filename}")
+    print(f"\nSaving to file: {filename}")
 
     # RUN
     done = True

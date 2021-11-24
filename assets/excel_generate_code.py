@@ -2,9 +2,6 @@
 # 将excel 自动生成python代码，缩短加载时间
 import xlrd
 
-# 简单数据类型，int,float等
-from dige_stl.virtual_model_library.data_dict import OD
-
 
 class ExcelGenerateCode:
     def __init__(self):
