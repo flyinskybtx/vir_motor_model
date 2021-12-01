@@ -72,7 +72,7 @@ if __name__ == '__main__':
             self.sde_signal = SignalGenerator()
             self.sde_signal.set_param(self.sde_param, self.dt)
             self.uab_amp = 2
-            self.num = int(1e5)
+            self.num = int(1e6)
             self.sd_list = []
             self.ua_list = []
             self.Ia_list = []

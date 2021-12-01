@@ -11,9 +11,9 @@ class VirMotorParam:
         key += 1
         self.TCR = OD(key, first_name + 'TCR', 0, 'float32', data_dict)
         key += 1
-        self.Ld = OD(key, first_name + 'Ld', 0.98, 'float32', data_dict)
+        self.Ld = OD(key, first_name + 'Ld', 0.00485, 'float32', data_dict)  # 单位H
         key += 1
-        self.Lq = OD(key, first_name + 'Lq', 0.97, 'float32', data_dict)
+        self.Lq = OD(key, first_name + 'Lq', 0.00097, 'float32', data_dict)  # 单位H
         key += 1
         self.kF = OD(key, first_name + 'kF', 0.07, 'float32', data_dict)   # 力常数
         key += 1

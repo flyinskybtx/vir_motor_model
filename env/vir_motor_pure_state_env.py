@@ -11,7 +11,7 @@ STEADY_ACC_TOL = 5
 
 
 class VirMotorFullStateEnv(gym.Env):
-    def __init__(self, u=20, i=50, vel=100, acc=1000, noise=0, seq_len=1e4, acc_tol=5):
+    def __init__(self, u=50, i=10, vel=1e4, acc=1e4, noise=0, seq_len=1e4, acc_tol=1):
         self.motor = VirRotaryMotorModel()
         self.noise = noise
         self.max_step = int(seq_len)
@@ -127,3 +127,15 @@ class VirMotorFullStateEnv(gym.Env):
 
     def render(self, mode="human"):
         pass
+
+
+if __name__ == '__main__':
+    env = VirMotorFullStateEnv(u=50, i=10, vel=1e4, acc_tol=1)
+    env.reset(random_state=False)
+
+    ud = 1
+    uq = 48
+
+    for _ in range(int(1e5)):
+        state, _, _, _ = env.udq_step((ud, uq))
+        print(state)
